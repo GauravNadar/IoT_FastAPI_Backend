@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 COPY . /code/fastapi_iot
 
-CMD ["fastapi", "run", "fastapi_iot/main.py", "--port", "80"]
+CMD ["fastapi", "run", "fastapi_iot/main.py", "--port", "8000"]
