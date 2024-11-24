@@ -3,7 +3,8 @@ from sqlalchemy.orm import sessionmaker
 from typing import Generator
 from core.config import settings
 
-SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
+#SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
+SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://iotuser:iotpassword@localhost:5432/iot"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
