@@ -5,12 +5,13 @@ from apis.v1.route_login import get_current_user
 from database.schemas.users import User, ShowUser
 from database.session import get_db
 from typing import Annotated
+import json
 
 router = APIRouter()
 
-# CONNECT_TOPIC = "HOME/C8:2E:18:67:95:A8/POST"
-# CONFIG_TOPIC = "HOME/C8:2E:18:67:95:A8/CONFIG"
-TOPIC = "test/mqtt/3"
+# TEST_TOPIC = "test/mqtt/3"
+SEND_TOPIC = "HOME/C8:2E:18:67:95:A8/CONFIG"
+RECIEVE_TOPIC = "HOME/C8:2E:18:67:95:A8/POST"
 
 def subscribe(client, topic):
     def on_message(client, userdata, msg):
@@ -24,7 +25,7 @@ def publish(client, msg, topic):
     # result: [0, 1]
     status = result[0]
     if status == 0:
-        print(f"Send `{msg}` to topic `{topic}`")
+        print(f"Send `{str(msg)}` to topic `{topic}`")
     else:
         print(f"Failed to send message to topic {topic}")
 
@@ -34,13 +35,13 @@ def connect_device(request: Request, db: Session = Depends(get_db)):
     # user = create_new_user(user=user,db=db)
 
     client = request.app.extra["MQTT_CONN_CLIENT"]
-    subscribe(client, TOPIC)
+    subscribe(client, RECIEVE_TOPIC)
     return {}
 
 @router.post("/send-command", status_code=status.HTTP_201_CREATED)
 def publish_mqtt(request: Request, body: Annotated[dict, Body()], db: Session = Depends(get_db)):
-    #sample_msg = {"home":{"light1":"ON","light2":"OFF","fan":"ON","socket":"OFF","fan_speed":"1"}}
-    msg = str(body)
+    sample_msg = {'home':{'light1':'ON','light2':'OFF','fan':'OFF','socket':'OFF','fan_speed':'1'}}
+    msg = json.dumps(body)
     client = request.app.extra["MQTT_CONN_CLIENT"]
-    publish(client, msg, TOPIC)
+    publish(client, msg, SEND_TOPIC)
     return {"MSG": "DONE"}
